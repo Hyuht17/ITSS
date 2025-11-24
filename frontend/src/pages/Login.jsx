@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
-  
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -27,7 +27,7 @@ const Login = () => {
       ...prev,
       [name]: value
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
@@ -45,15 +45,15 @@ const Login = () => {
     const newErrors = {};
 
     if (!formData.email.trim()) {
-      newErrors.email = 'メールアドレスを入力してください / Email is required';
+      newErrors.email = 'メールアドレスを入力してください';
     } else if (!validateEmail(formData.email)) {
-      newErrors.email = '有効なメールアドレスを入力してください / Invalid email format';
+      newErrors.email = '有効なメールアドレスを入力してください';
     }
 
     if (!formData.password) {
-      newErrors.password = 'パスワードを入力してください / Password is required';
+      newErrors.password = 'パスワードを入力してください';
     } else if (formData.password.length < 6) {
-      newErrors.password = 'パスワードは6文字以上である必要があります / Password must be at least 6 characters';
+      newErrors.password = 'パスワードは6文字以上である必要があります';
     }
 
     setErrors(newErrors);
@@ -75,7 +75,7 @@ const Login = () => {
       const result = await login(formData.email, formData.password);
 
       if (result.success) {
-        navigate('/dashboard');
+        navigate('/home');
       } else {
         // Handle field-specific errors
         if (result.errors) {
@@ -89,144 +89,162 @@ const Login = () => {
         }
       }
     } catch (error) {
-      setGeneralError('予期しないエラーが発生しました / An unexpected error occurred');
+      setGeneralError('予期しないエラーが発生しました');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4 py-12">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              ログイン
-            </h1>
-            <p className="text-gray-600">
-              Sign in to your account
-            </p>
-          </div>
+    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 relative overflow-hidden">
+      {/* Decorative Background Elements */}
+      <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-blue-200/30 to-purple-200/30 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-br from-indigo-200/30 to-pink-200/30 rounded-full blur-3xl translate-x-1/2 translate-y-1/2"></div>
 
+      <div className="w-full max-w-2xl relative z-10">
+        {/* Header */}
+        <div className="text-center mb-8 animate-fade-in">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-800 via-blue-900 to-indigo-900 bg-clip-text text-transparent mb-3">
+            先生リンク
+          </h1>
+          <p className="text-lg text-slate-700">
+            先生リンクへようこそ
+          </p>
+        </div>
+
+        {/* Login Card */}
+        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 p-12 transform transition-all duration-300 hover:shadow-blue-200/50">
           {/* General Error Message */}
           {generalError && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm text-red-600">{generalError}</p>
+            <div className="mb-6 p-4 bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-xl shadow-sm animate-shake">
+              <p className="text-sm text-red-700 font-medium">{generalError}</p>
             </div>
           )}
 
           {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Field */}
-            <div>
-              <label 
-                htmlFor="email" 
-                className="block text-sm font-medium text-gray-700 mb-2"
+            <div className="flex items-start gap-4">
+              <label
+                htmlFor="email"
+                className="w-40 pt-3 text-sm font-semibold text-slate-800 text-right flex-shrink-0"
               >
-                メールアドレス / Email
+                メールアドレス <span className="text-rose-500">*</span>
               </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="example@email.com"
-                className={`w-full px-4 py-3 rounded-lg border ${
-                  errors.email 
-                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500' 
-                    : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500'
-                } focus:ring-2 focus:outline-none transition-colors`}
-                disabled={isLoading}
-              />
-              {errors.email && (
-                <p className="mt-2 text-sm text-red-600">{errors.email}</p>
-              )}
+              <div className="flex-1">
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className={`w-full px-5 py-3.5 rounded-full border-2 ${errors.email
+                    ? 'border-red-400 bg-red-50/50'
+                    : 'border-slate-200 bg-white'
+                    } focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 shadow-sm hover:shadow-md`}
+                  disabled={isLoading}
+                />
+                <p className="mt-2 text-xs text-slate-500 leading-relaxed">
+                  メールアドレスは半角スクランチャーマークでスクリし
+                  <br />
+                  てください。例：name@example.com
+                </p>
+                {errors.email && (
+                  <p className="mt-2 text-sm text-red-600 font-medium animate-fade-in">{errors.email}</p>
+                )}
+              </div>
             </div>
 
             {/* Password Field */}
-            <div>
-              <label 
-                htmlFor="password" 
-                className="block text-sm font-medium text-gray-700 mb-2"
+            <div className="flex items-start gap-4">
+              <label
+                htmlFor="password"
+                className="w-40 pt-3 text-sm font-semibold text-slate-800 text-right flex-shrink-0"
               >
-                パスワード / Password
+                パスワード <span className="text-rose-500">*</span>
               </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="••••••••"
-                className={`w-full px-4 py-3 rounded-lg border ${
-                  errors.password 
-                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500' 
-                    : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500'
-                } focus:ring-2 focus:outline-none transition-colors`}
-                disabled={isLoading}
-              />
-              {errors.password && (
-                <p className="mt-2 text-sm text-red-600">{errors.password}</p>
-              )}
+              <div className="flex-1">
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className={`w-full px-5 py-3.5 rounded-full border-2 ${errors.password
+                    ? 'border-red-400 bg-red-50/50'
+                    : 'border-slate-200 bg-white'
+                    } focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 shadow-sm hover:shadow-md`}
+                  disabled={isLoading}
+                />
+                <p className="mt-2 text-xs text-slate-500">
+                  パスワードを入力してください
+                </p>
+                {errors.password && (
+                  <p className="mt-2 text-sm text-red-600 font-medium animate-fade-in">{errors.password}</p>
+                )}
+              </div>
             </div>
 
             {/* Forgot Password Link */}
-            <div className="flex items-center justify-end">
+            <div className="flex items-center justify-center">
               <Link
                 to="/forgot-password"
-                className="text-sm text-indigo-600 hover:text-indigo-500 font-medium transition-colors"
+                className="text-sm text-blue-600 hover:text-blue-800 transition-colors font-medium hover:underline"
               >
-                パスワードをお忘れの方 / Forgot password?
+                パスワードをお忘れの方
               </Link>
             </div>
 
             {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className={`w-full py-3 px-4 rounded-lg font-medium text-white transition-all ${
-                isLoading
-                  ? 'bg-indigo-400 cursor-not-allowed'
-                  : 'bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800'
-              } focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
-            >
-              {isLoading ? (
-                <span className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  ログイン中... / Logging in...
-                </span>
-              ) : (
-                'ログイン / Login'
-              )}
-            </button>
+            <div className="flex justify-center pt-4">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className={`px-20 py-3.5 rounded-full font-semibold text-white transition-all duration-300 transform hover:scale-105 shadow-lg ${isLoading
+                  ? 'bg-slate-400 cursor-not-allowed shadow-none scale-100'
+                  : 'bg-gradient-to-r from-slate-800 via-blue-900 to-indigo-900 hover:shadow-blue-500/50 hover:shadow-xl'
+                  }`}
+              >
+                {isLoading ? 'ログイン中...' : 'ロゲイン'}
+              </button>
+            </div>
           </form>
 
-          {/* Register Link */}
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              アカウントをお持ちでない方 / Don't have an account?{' '}
-              <Link
-                to="/register"
-                className="text-indigo-600 hover:text-indigo-500 font-medium transition-colors"
-              >
-                新規登録 / Sign up
-              </Link>
+          {/* Demo Info */}
+          {/* <div className="mt-6 text-center">
+            <p className="text-xs text-slate-500">
+              デモ: demo@example.com / password123
             </p>
-          </div>
-
-          {/* Demo Credentials */}
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-            <p className="text-xs text-gray-600 text-center">
-              <strong>Demo:</strong> demo@example.com / password123
-            </p>
-          </div>
+          </div> */}
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes fade-in {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-5px); }
+          75% { transform: translateX(5px); }
+        }
+
+        .animate-fade-in {
+          animation: fade-in 0.5s ease-out;
+        }
+
+        .animate-shake {
+          animation: shake 0.3s ease-out;
+        }
+      `}</style>
     </div>
   );
 };

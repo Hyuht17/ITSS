@@ -88,4 +88,50 @@ export const authAPI = {
   },
 };
 
+// Teacher API calls
+export const teacherAPI = {
+  // すべての教師プロフィールを取得
+  getAllTeachers: async () => {
+    const response = await api.get('/teachers');
+    return response.data; // { status, message, data, count }
+  },
+
+  // 特定の教師プロフィールを取得
+  getTeacherProfile: async (teacherId) => {
+    const response = await api.get(`/teachers/${teacherId}`);
+    return response.data; // { status, message, data }
+  },
+
+  // 自分の教師プロフィールを取得
+  getMyTeacherProfile: async () => {
+    const response = await api.get('/teachers/me');
+    return response.data; // { status, message, data }
+  },
+
+  // 教師プロフィールを作成
+  createTeacherProfile: async (profileData) => {
+    const response = await api.post('/teachers', profileData);
+    return response.data; // { status, message, data }
+  },
+
+  // 教師プロフィールを更新
+  updateTeacherProfile: async (teacherId, profileData) => {
+    const response = await api.put(`/teachers/${teacherId}`, profileData);
+    return response.data; // { status, message, data }
+  },
+
+  // アバター画像をアップロード
+  uploadTeacherAvatar: async (teacherId, file) => {
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    const response = await api.post(`/teachers/${teacherId}/upload-avatar`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data; // { status, message, data: { avatarUrl, publicId } }
+  },
+};
+
 export default api;

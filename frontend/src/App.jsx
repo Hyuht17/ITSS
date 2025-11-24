@@ -2,9 +2,13 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
-import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
+
 import ForgotPassword from './pages/ForgotPassword';
+import Home from './pages/Home';
+import TeacherProfile from './pages/TeacherProfile';
+import EditTeacherProfile from './pages/EditTeacherProfile';
+import Schedule from './pages/Schedule';
+import Messages from './pages/Messages';
 
 function App() {
   return (
@@ -13,13 +17,45 @@ function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route
-            path="/dashboard"
+            path="/home"
             element={
               <ProtectedRoute>
-                <Dashboard />
+                <Home />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile/:id"
+            element={
+              <ProtectedRoute>
+                <TeacherProfile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile/edit/:id"
+            element={
+              <ProtectedRoute>
+                <EditTeacherProfile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/schedule"
+            element={
+              <ProtectedRoute>
+                <Schedule />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/messages"
+            element={
+              <ProtectedRoute>
+                <Messages />
               </ProtectedRoute>
             }
           />
