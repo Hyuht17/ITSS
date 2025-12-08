@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with default config
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: 'http://localhost:5000/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -132,6 +132,128 @@ export const teacherAPI = {
     });
     return response.data; // { status, message, data: { avatarUrl, publicId } }
   },
+
+  // 教師おすすめ一覧を取得
+  getRecommendations: async (params = {}) => {
+    const queryParams = new URLSearchParams();
+
+    // 時間帯
+    if (params.timeSlots && params.timeSlots.length > 0) {
+      params.timeSlots.forEach(slot => queryParams.append('timeSlots', slot));
+    }
+
+    // 地域
+    if (params.cities && params.cities.length > 0) {
+      params.cities.forEach(city => queryParams.append('cities', city));
+    }
+
+    // 専門分野
+    if (params.specialties && params.specialties.length > 0) {
+      params.specialties.forEach(specialty => queryParams.append('specialties', specialty));
+    }
+
+    // ページネーション
+    if (params.page) queryParams.append('page', params.page);
+    if (params.limit) queryParams.append('limit', params.limit);
+
+    const response = await api.get(`/recommendations?${queryParams.toString()}`);
+    return response.data; // { success, data: { teachers, pagination } }
+  },
+};
+
+// Availability API calls
+export const availabilityAPI = {
+  getAvailability: async () => {
+    const response = await api.get('/teachers/availability/me');
+    return response.data;
+  },
+
+  registerAvailability: async (availabilities) => {
+    const response = await api.post('/teachers/availability', { availabilities });
+    return response.data;
+  },
+
+  // 登録済み空き時間を取得 (legacy endpoint?)
+  getAvailabilities: async () => {
+    const response = await api.get('/teachers/availability');
+    return response.data;
+  },
+
+  // 特定の空き時間を取得
+  getAvailabilityById: async (id) => {
+    const response = await api.get(`/teachers/availability/${id}`);
+    return response.data;
+  },
+
+  // 空き時間を更新
+  updateAvailability: async (id, updateData) => {
+    const response = await api.put(`/teachers/availability/${id}`, updateData);
+    return response.data;
+  },
+
+  // 空き時間を削除
+  deleteAvailability: async (id) => {
+    const response = await api.delete(`/teachers/availability/${id}`);
+    return response.data;
+  },
+
+  // 全ての空き時間を削除
+  deleteAllAvailabilities: async () => {
+    const response = await api.delete('/teachers/availability');
+    return response.data;
+  },
+};
+
+// Matching API calls
+export const matchingAPI = {
+  createRequest: async (receiverId) => {
+    const response = await api.post('/matching/requests', { receiverId });
+    return response.data;
+  },
+  getRequests: async () => {
+    const response = await api.get('/matching/requests');
+    return response.data;
+  },
+  approveRequest: async (id) => {
+    const response = await api.patch(`/matching/requests/${id}/approve`);
+    return response.data;
+  },
+  rejectRequest: async (id) => {
+    const response = await api.patch(`/matching/requests/${id}/reject`);
+    return response.data;
+  },
+  cancelRequest: async (id) => {
+    const response = await api.delete(`/matching/requests/${id}`);
+    return response.data;
+  }
+};
+
+// Messages API
+export const messagesAPI = {
+  // Get list of conversations
+  getMessageList: async () => {
+    const response = await api.get('/messages/list');
+    return response.data;
+  },
+  // Get conversation with a specific user
+  getConversation: async (userId) => {
+    const response = await api.get(`/messages/conversation/${userId}`);
+    return response.data;
+  },
+  // Send a message (with optional file attachment)
+  sendMessage: async (formData) => {
+    const response = await api.post('/messages/send', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    return response.data;
+  },
+  // Mark messages as read
+  markAsRead: async (userId) => {
+    const response = await api.patch(`/messages/read/${userId}`);
+    return response.data;
+  }
 };
 
 export default api;

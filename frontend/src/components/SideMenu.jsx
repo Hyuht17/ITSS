@@ -11,6 +11,11 @@ const SideMenu = () => {
     const navigate = useNavigate();
     const { user, logout } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
+    const [expandedMenu, setExpandedMenu] = useState('マッチングステータス'); // Default expanded
+
+    const toggleSubMenu = (label) => {
+        setExpandedMenu(expandedMenu === label ? null : label);
+    };
 
     const menuItems = [
         {
@@ -32,7 +37,7 @@ const SideMenu = () => {
             )
         },
         {
-            path: '/connections',
+            path: '/teacher-connection',
             label: '教師とのつながり',
             icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -41,13 +46,19 @@ const SideMenu = () => {
             )
         },
         {
-            path: '/matching-status',
+            path: '/matching-status/pending',
             label: 'マッチングステータス',
             icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
-            )
+            ),
+            // Define sub-items for accordion
+            subItems: [
+                { path: '/matching-status/pending', label: '保留中' },
+                { path: '/matching-status/approved', label: '承認済み' },
+                { path: '/matching-status/finished', label: '終了' }
+            ]
         },
         {
             path: '/schedule',
@@ -112,7 +123,7 @@ const SideMenu = () => {
           fixed top-0 left-0 h-screen bg-gradient-to-b from-gray-900 to-gray-800 shadow-2xl z-40
           transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-          lg:translate-x-0 lg:static lg:w-64
+          lg:translate-x-0 lg:sticky lg:top-0 lg:w-64
           flex flex-col
         `}
             >
@@ -135,21 +146,47 @@ const SideMenu = () => {
                     <ul className="space-y-1">
                         {menuItems.map((item) => (
                             <li key={item.path}>
-                                <Link
-                                    to={item.path}
+                                <div
                                     className={`
-                      flex items-center gap-3 px-4 py-3 rounded-lg
-                      transition-all duration-200
-                      ${isActive(item.path)
+                                        flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer
+                                        transition-all duration-200
+                                        ${isActive(item.path)
                                             ? 'bg-white text-gray-900 shadow-lg'
-                                            : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                                            : 'text-gray-300 hover:bg-gray-700 hover:text-white'}
+                                    `}
+                                    onClick={() => {
+                                        if (item.subItems) {
+                                            toggleSubMenu(item.label);
+                                        } else {
+                                            navigate(item.path);
+                                            setIsOpen(false);
                                         }
-                    `}
-                                    onClick={() => setIsOpen(false)}
+                                    }}
                                 >
                                     {item.icon}
                                     <span className="font-medium text-sm">{item.label}</span>
-                                </Link>
+                                </div>
+
+                                {item.subItems && expandedMenu === item.label && (
+                                    <ul className="ml-10 mt-1 space-y-1">
+                                        {item.subItems.map((sub) => (
+                                            <li key={sub.path}>
+                                                <Link
+                                                    to={sub.path}
+                                                    className={`
+                                                        block px-3 py-2 text-sm rounded-md
+                                                        ${isActive(sub.path)
+                                                            ? 'bg-white text-gray-900 shadow'
+                                                            : 'text-gray-300 hover:bg-gray-700 hover:text-white'}
+                                                    `}
+                                                    onClick={() => setIsOpen(false)}
+                                                >
+                                                    {sub.label}
+                                                </Link>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
                             </li>
                         ))}
                     </ul>
