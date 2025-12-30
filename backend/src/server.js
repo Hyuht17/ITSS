@@ -4,22 +4,20 @@ import dotenv from 'dotenv';
 
 // Import routes
 import routes from './routes/index.js';
-import { apiLimiter } from './middlewares/rateLimiter.middleware.js';
-import { initDemoData } from './config/database.js';
+import connectDB from './config/mongodb.config.js';
+import seedDatabase from './config/seed.js';
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Apply rate limiting to all routes
-app.use('/api/', apiLimiter);
 
 // Routes
 app.use('/api', routes);
@@ -50,13 +48,27 @@ app.use((req, res) => {
   });
 });
 
-// Initialize demo data
-await initDemoData();
+// MongoDB接続とサーバー起動
+const startServer = async () => {
+  try {
+    // MongoDB接続
+    await connectDB();
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV}`);
-});
+    // デモデータ作成（初回のみ）
+    await seedDatabase();
+
+    // サーバー起動
+    app.listen(PORT, () => {
+      console.log(`🚀 Server is running on port ${PORT}`);
+      console.log(`📁 Environment: ${process.env.NODE_ENV}`);
+      console.log(`🌐 API URL: http://localhost:${PORT}/api`);
+    });
+  } catch (error) {
+    console.error('❌ Server startup failed:', error);
+    process.exit(1);
+  }
+};
+
+startServer();
 
 export default app;

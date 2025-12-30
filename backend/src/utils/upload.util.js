@@ -9,19 +9,24 @@ import cloudinary from '../config/cloudinary.config.js';
  * @param {Buffer|string} file - アップロードするファイル（BufferまたはBase64）
  * @param {string} folder - Cloudinaryのフォルダ名
  * @param {string} publicId - ファイルのpublic ID（オプション）
+ * @param {boolean} skipTransformations - true の場合、画像変換をスキップ（ファイル添付用）
  * @returns {Promise<object>} アップロード結果
  */
-export const uploadToCloudinary = async (file, folder = 'teacher-avatars', publicId = null) => {
+export const uploadToCloudinary = async (file, folder = 'teacher-avatars', publicId = null, skipTransformations = false) => {
     try {
         const options = {
             folder: folder,
             resource_type: 'auto',
-            transformation: [
+        };
+
+        // Only apply transformations for images (avatars)
+        if (!skipTransformations) {
+            options.transformation = [
                 { width: 400, height: 400, crop: 'fill', gravity: 'face' },
                 { quality: 'auto:good' },
                 { fetch_format: 'auto' }
-            ]
-        };
+            ];
+        }
 
         if (publicId) {
             options.public_id = publicId;

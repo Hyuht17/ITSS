@@ -7,8 +7,15 @@ import ForgotPassword from './pages/ForgotPassword';
 import Home from './pages/Home';
 import TeacherProfile from './pages/TeacherProfile';
 import EditTeacherProfile from './pages/EditTeacherProfile';
+import TeacherConnection from './pages/TeacherConnection';
+import TeacherRecommendations from './pages/TeacherRecommendations';
 import Schedule from './pages/Schedule';
+import CreateSchedule from './pages/CreateSchedule';
 import Messages from './pages/Messages';
+import MatchingStatus from './pages/MatchingStatus';
+import FinishedMatchings from './pages/FinishedMatchings';
+import CreateFeedback from './pages/CreateFeedback';
+import ReceivedFeedbacks from './pages/ReceivedFeedbacks';
 
 function App() {
   return (
@@ -44,6 +51,30 @@ function App() {
             }
           />
           <Route
+            path="/teacher-connection"
+            element={
+              <ProtectedRoute>
+                <TeacherConnection />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/connection"
+            element={
+              <ProtectedRoute>
+                <TeacherConnection />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/recommendations"
+            element={
+              <ProtectedRoute>
+                <TeacherRecommendations />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/schedule"
             element={
               <ProtectedRoute>
@@ -52,10 +83,50 @@ function App() {
             }
           />
           <Route
+            path="/schedule/create"
+            element={
+              <ProtectedRoute>
+                <CreateSchedule />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/messages"
             element={
               <ProtectedRoute>
                 <Messages />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/matching-status/*"
+            element={
+              <ProtectedRoute>
+                <MatchingStatus />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/matching-status/finished"
+            element={
+              <ProtectedRoute>
+                <FinishedMatchings />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/feedback/create/:matchingId"
+            element={
+              <ProtectedRoute>
+                <CreateFeedback />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/feedback"
+            element={
+              <ProtectedRoute>
+                <ReceivedFeedbacks />
               </ProtectedRoute>
             }
           />

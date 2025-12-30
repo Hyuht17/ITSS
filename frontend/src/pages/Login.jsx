@@ -13,6 +13,8 @@ const Login = () => {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [generalError, setGeneralError] = useState('');
+  const [attemptCount, setAttemptCount] = useState(0);
+  const maxAttempts = 5;
 
   // Validate email format
   const validateEmail = (email) => {
@@ -65,6 +67,12 @@ const Login = () => {
     e.preventDefault();
     setGeneralError('');
 
+    // Check if max attempts reached
+    if (attemptCount >= maxAttempts) {
+      setGeneralError('ログイン試行回数が上限に達しました。しばらくしてからもう一度お試しください。');
+      return;
+    }
+
     if (!validateForm()) {
       return;
     }
@@ -75,8 +83,16 @@ const Login = () => {
       const result = await login(formData.email, formData.password);
 
       if (result.success) {
+        // Reset attempt count on successful login
+        setAttemptCount(0);
         navigate('/home');
       } else {
+        // Increment attempt count on failure
+        const newAttemptCount = attemptCount + 1;
+        setAttemptCount(newAttemptCount);
+
+        const remainingAttempts = maxAttempts - newAttemptCount;
+
         // Handle field-specific errors
         if (result.errors) {
           const fieldErrors = {};
@@ -84,12 +100,25 @@ const Login = () => {
             fieldErrors[err.field] = err.message;
           });
           setErrors(fieldErrors);
-        } else {
-          setGeneralError(result.error);
         }
+
+        // Set general error with attempt count
+        let errorMessage = result.error || 'メールアドレスまたはパスワードが正しくありません';
+        if (remainingAttempts > 0) {
+          errorMessage += ` (残り${remainingAttempts}回の試行)`;
+        }
+        setGeneralError(errorMessage);
       }
     } catch (error) {
-      setGeneralError('予期しないエラーが発生しました');
+      const newAttemptCount = attemptCount + 1;
+      setAttemptCount(newAttemptCount);
+      const remainingAttempts = maxAttempts - newAttemptCount;
+
+      let errorMessage = '予期しないエラーが発生しました';
+      if (remainingAttempts > 0) {
+        errorMessage += ` (残り${remainingAttempts}回の試行)`;
+      }
+      setGeneralError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -116,8 +145,18 @@ const Login = () => {
         <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 p-12 transform transition-all duration-300 hover:shadow-blue-200/50">
           {/* General Error Message */}
           {generalError && (
-            <div className="mb-6 p-4 bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-xl shadow-sm animate-shake">
-              <p className="text-sm text-red-700 font-medium">{generalError}</p>
+            <div className={`mb-6 p-4 border rounded-xl shadow-sm animate-shake ${maxAttempts - attemptCount <= 1
+                ? 'bg-gradient-to-r from-red-50 to-pink-50 border-red-300'
+                : maxAttempts - attemptCount <= 3
+                  ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-300'
+                  : 'bg-gradient-to-r from-red-50 to-pink-50 border-red-200'
+              }`}>
+              <p className={`text-sm font-medium ${maxAttempts - attemptCount <= 1
+                  ? 'text-red-800'
+                  : maxAttempts - attemptCount <= 3
+                    ? 'text-yellow-800'
+                    : 'text-red-700'
+                }`}>{generalError}</p>
             </div>
           )}
 

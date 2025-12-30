@@ -30,7 +30,7 @@ export const authenticateToken = async (req, res, next) => {
       }
 
       // Get user from database
-      const user = User.findById(decoded.userId);
+      const user = await User.findById(decoded.userId);
       if (!user) {
         return res.status(404).json({
           message: 'User not found',
@@ -38,8 +38,13 @@ export const authenticateToken = async (req, res, next) => {
         });
       }
 
-      // Attach user to request
-      req.user = user;
+      // Attach user info to request
+      req.user = {
+        userId: decoded.userId,
+        email: user.email,
+        name: user.name,
+        role: user.role
+      };
       next();
     });
   } catch (error) {
@@ -65,8 +70,17 @@ export const optionalAuth = async (req, res, next) => {
       if (err) {
         req.user = null;
       } else {
-        const user = User.findById(decoded.userId);
-        req.user = user || null;
+        const user = await User.findById(decoded.userId);
+        if (user) {
+          req.user = {
+            userId: decoded.userId,
+            email: user.email,
+            name: user.name,
+            role: user.role
+          };
+        } else {
+          req.user = null;
+        }
       }
       next();
     });
