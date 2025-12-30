@@ -4,19 +4,24 @@ import {
     getRequests,
     approveRequest,
     rejectRequest,
-    cancelRequest
+    cancelRequest,
+    getAcceptedMatchings,
+    getFinishedMatchings
 } from '../controllers/matching.request.controller.js';
 import { authenticateToken } from '../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
-// 全てのエンドポイントで認証が必要
+// すべてのルートに認証を適用
 router.use(authenticateToken);
 
-router.post('/requests', createRequest);
-router.get('/requests', getRequests);
-router.patch('/requests/:id/approve', approveRequest);
-router.patch('/requests/:id/reject', rejectRequest);
-router.delete('/requests/:id', cancelRequest);
+// ルート定義
+router.post('/requests', createRequest); // マッチング申請作成
+router.get('/requests', getRequests); // マッチング申請一覧取得
+router.patch('/requests/:id/approve', approveRequest); // マッチング申請承認
+router.patch('/requests/:id/reject', rejectRequest); // マッチング申請拒否
+router.delete('/requests/:id', cancelRequest); // マッチング申請キャンセル
+router.get('/accepted', getAcceptedMatchings); // 承認済みマッチング一覧
+router.get('/finished', getFinishedMatchings); // 終了したマッチング一覧
 
 export default router;

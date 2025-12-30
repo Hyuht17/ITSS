@@ -21,19 +21,29 @@ const MatchingStatus = () => {
 
     // Fetch requests on mount
     useEffect(() => {
-        fetchRequests();
+        fetchMatchings();
     }, []);
 
-    const fetchRequests = async () => {
+    const fetchMatchings = async () => {
         try {
             setLoading(true);
-            const data = await matchingAPI.getRequests();
-            if (data.success) {
-                setRequests(data.data);
-            }
+            const response = await matchingAPI.getRequests();
+
+            // Get current user ID - user object stores _id, not userId
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const userId = localStorage.getItem('userId') || user._id || user.userId;
+            const allMatchings = response.data || [];
+
+            // Helper to extract ID from either string or object
+            const getId = (ref) => (typeof ref === 'object' && ref?._id) ? ref._id : ref;
+
+            const sent = allMatchings.filter(m => getId(m.requesterId) === userId);
+            const received = allMatchings.filter(m => getId(m.receiverId) === userId);
+
+            setRequests({ sent, received });
         } catch (err) {
-            console.error('Error fetching requests:', err);
-            setError('データの取得に失敗しました');
+            console.error('Error fetching matchings:', err);
+            setError('マッチング情報の読み込みに失敗しました');
         } finally {
             setLoading(false);
         }
@@ -42,7 +52,7 @@ const MatchingStatus = () => {
     const handleApprove = async (id) => {
         try {
             await matchingAPI.approveRequest(id);
-            fetchRequests(); // Refresh
+            fetchMatchings(); // Refresh
         } catch (err) {
             console.error(err);
             alert('承認に失敗しました');
@@ -53,7 +63,7 @@ const MatchingStatus = () => {
         if (!window.confirm('本当に拒否しますか？')) return;
         try {
             await matchingAPI.rejectRequest(id);
-            fetchRequests();
+            fetchMatchings();
         } catch (err) {
             console.error(err);
             alert('拒否に失敗しました');
@@ -64,7 +74,7 @@ const MatchingStatus = () => {
         if (!window.confirm('申請を取り消しますか？')) return;
         try {
             await matchingAPI.cancelRequest(id);
-            fetchRequests();
+            fetchMatchings();
         } catch (err) {
             console.error(err);
             alert('キャンセルに失敗しました');
@@ -72,12 +82,12 @@ const MatchingStatus = () => {
     };
 
     // Filter Logic
-    const pendingReceived = requests.received.filter(r => r.status === 'pending');
-    const pendingSent = requests.sent.filter(r => r.status === 'pending');
+    const pendingReceived = (requests.received || []).filter(r => r.status === 'pending');
+    const pendingSent = (requests.sent || []).filter(r => r.status === 'pending');
 
     const approvedMatches = [
-        ...requests.received.filter(r => r.status === 'approved'),
-        ...requests.sent.filter(r => r.status === 'approved')
+        ...(requests.received || []).filter(r => r.status === 'approved'),
+        ...(requests.sent || []).filter(r => r.status === 'approved')
     ];
 
     // Card Components
@@ -165,8 +175,8 @@ const MatchingStatus = () => {
         <div className="flex min-h-screen bg-gray-100">
             <SideMenu />
 
-            <main className="flex-1 p-8">
-                <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-200 min-h-[500px] overflow-hidden">
+            <main className="flex-1 p-6">
+                <div className="max-w-8xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-200 min-h-[500px] overflow-hidden">
                     {/* Header */}
                     <div className="p-6 border-b border-gray-100">
                         <div className="flex items-center gap-2 mb-1">

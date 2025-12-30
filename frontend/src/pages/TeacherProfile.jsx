@@ -85,8 +85,8 @@ const TeacherProfile = () => {
         <div className="flex min-h-screen bg-gray-100">
             <SideMenu />
 
-            <main className="flex-1 p-8">
-                <div className="max-w-7xl mx-auto">
+            <main className="flex-1 p-6">
+                <div className="max-w-8xl mx-auto">
                     {/* ヘッダー */}
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 mb-6">
                         <div className="flex items-center justify-between px-6 py-4">

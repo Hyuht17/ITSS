@@ -70,6 +70,18 @@ const Messages = () => {
         }
     };
 
+    const handleConversationClick = (userId) => {
+        // Instant UI update - clear unread count immediately
+        setConversations(prev => prev.map(conv =>
+            conv.user._id === userId
+                ? { ...conv, unreadCount: 0 }
+                : conv
+        ));
+
+        // Then proceed with selection and fetching
+        setSelectedUserId(userId);
+    };
+
     const handleFileSelect = (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -190,7 +202,7 @@ const Messages = () => {
                                 <div
                                     key={conv.user._id}
                                     className={`conversation-item ${selectedUserId === conv.user._id ? 'active' : ''}`}
-                                    onClick={() => setSelectedUserId(conv.user._id)}
+                                    onClick={() => handleConversationClick(conv.user._id)}
                                 >
                                     <div className="conversation-avatar">
                                         {conv.user.profilePhoto ? (

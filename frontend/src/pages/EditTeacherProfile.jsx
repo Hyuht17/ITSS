@@ -161,7 +161,7 @@ const EditTeacherProfile = () => {
         <div className="flex min-h-screen bg-gray-100">
             <SideMenu />
 
-            <main className="flex-1 p-8">
+            <main className="flex-1 p-6">
                 <div className="max-w-5xl mx-auto">
                     {/* タイトル */}
                     <h1 className="text-2xl font-bold text-gray-900 mb-6">

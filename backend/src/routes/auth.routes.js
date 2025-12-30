@@ -7,7 +7,6 @@ import {
   register
 } from '../controllers/auth.controller.js';
 import { authenticateToken } from '../middlewares/auth.middleware.js';
-import { loginLimiter } from '../middlewares/rateLimiter.middleware.js';
 import {
   loginValidation,
   registerValidation,
@@ -17,7 +16,7 @@ import {
 const router = express.Router();
 
 // Public routes
-router.post('/login', loginLimiter, loginValidation, validate, login);
+router.post('/login', loginValidation, validate, login);
 router.post('/register', registerValidation, validate, register);
 router.post('/refresh', refreshToken);
 

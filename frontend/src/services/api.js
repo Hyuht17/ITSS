@@ -225,6 +225,14 @@ export const matchingAPI = {
   cancelRequest: async (id) => {
     const response = await api.delete(`/matching/requests/${id}`);
     return response.data;
+  },
+  getAcceptedMatchings: async () => {
+    const response = await api.get('/matching/accepted');
+    return response.data;
+  },
+  getFinished: async () => {
+    const response = await api.get('/matching/finished');
+    return response.data;
   }
 };
 
@@ -256,4 +264,54 @@ export const messagesAPI = {
   }
 };
 
+// Schedule API calls
+export const scheduleAPI = {
+  getSchedules: async (startDate, endDate) => {
+    const response = await api.get('/schedules', {
+      params: {
+        start_date: startDate.toISOString(),
+        end_date: endDate.toISOString()
+      }
+    });
+    return response.data;
+  },
+
+  getScheduleById: async (id) => {
+    const response = await api.get(`/schedules/${id}`);
+    return response.data;
+  },
+
+  createSchedule: async (scheduleData) => {
+    const response = await api.post('/schedules', scheduleData);
+    return response.data;
+  },
+
+  getScheduleTemplates: async () => {
+    const response = await api.get('/schedules/templates');
+    return response.data;
+  }
+};
+
+// Feedback API
+export const feedbackAPI = {
+  create: async (data) => {
+    const response = await api.post('/feedbacks', data);
+    return response.data;
+  },
+  getByMatching: async (matchingId) => {
+    const response = await api.get(`/feedbacks/matching/${matchingId}`);
+    return response.data;
+  },
+  getReceived: async () => {
+    const response = await api.get('/feedbacks/received');
+    return response.data;
+  },
+  update: async (feedbackId, data) => {
+    const response = await api.put(`/feedbacks/${feedbackId}`, data);
+    return response.data;
+  }
+};
+
 export default api;
+
+
